@@ -169,6 +169,7 @@ class MainActivity : AppCompatActivity() {
         selectAllCB.setOnCheckedChangeListener { _, flag ->
             brandList.forEach {
                 it.status = flag
+                locationAdaptor.notifyDataSetChanged()
             }
         }
     }
