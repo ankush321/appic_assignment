@@ -2,13 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="8dp"
     android:orientation="horizontal">
 
     <CheckBox
         android:id="@+id/rv_cb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Box"
+        android:hint="@string/select_brand"
         android:textColor="@color/grey"
         />
 

@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.appic.assignment.R
+import com.appic.assignment.ui.model.Item
 import com.appic.assignment.util.inflateView
 
 class CompanyAdapter(private val list: List<String>) : RecyclerView.Adapter<CompanyViewHolder>() {
@@ -17,6 +18,9 @@ class CompanyAdapter(private val list: List<String>) : RecyclerView.Adapter<Comp
     }
 
     override fun getItemCount(): Int = list.size
+
+    fun updateList(list: List<Item>){
+    }
 }
 
 class CompanyViewHolder(view: View) : RecyclerView.ViewHolder(view) {

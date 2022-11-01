@@ -5,6 +5,7 @@
     android:id="@+id/bottomSheetLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_round_background"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,35 +43,25 @@
             android:background="@color/grey"
             app:layout_constraintTop_toBottomOf="@+id/tv" />
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/vg1"
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
+            android:layout_margin="8dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/v">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:src="@drawable/search" />
-
-            <EditText
-                android:id="@+id/et_search_brands"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Search for Brands" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
+            app:layout_constraintTop_toBottomOf="@+id/v"
+            app:queryBackground="@android:color/transparent"
+            app:queryHint="Search Brands"
+            android:background="@drawable/search_background"
+            />
 
         <View
             android:id="@+id/v1"
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginTop="8dp"
             android:background="@color/grey"
-            app:layout_constraintTop_toBottomOf="@+id/vg1" />
+            app:layout_constraintTop_toBottomOf="@+id/search_view" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/vg2"
@@ -89,6 +80,7 @@
                 android:textColor="@color/grey" />
 
             <TextView
+                android:id="@+id/clear_selection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -109,7 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bottomsheet_border_button"
-            android:text="Apply Filter"
+            android:text="@string/apply_filter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

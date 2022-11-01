@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.appic.assignment.R
@@ -79,12 +80,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainViewModel.brandList.observe(this) { list ->
-                    brandList = list
-                    val count = list.count { it.status }
-                    binding.vgSelectBrand.tvSelectedBrandCount.text = "$count"
-                    binding.vgBrand.tvBrand.text = "$count"
-                    Log.i("Selected Count ", "$count")
-                }
+            brandList = list
+            val count = list.count { it.status }
+            binding.vgSelectBrand.tvSelectedBrandCount.text = "$count"
+            binding.vgBrand.tvBrand.text = "$count"
+            Log.i("Selected Count ", "$count")
+        }
 
         mainViewModel.locationList.observe(this) { list ->
             locationList = list
@@ -100,9 +101,11 @@ class MainActivity : AppCompatActivity() {
             else
                 binding.rvCompany.visibility = View.INVISIBLE
             val list = companyList
-            companyAdapter = CompanyAdapter(list)
-            binding.rvCompany.adapter = companyAdapter
-            companyAdapter.notifyDataSetChanged()
+            if (flag) {
+                companyAdapter = CompanyAdapter(list)
+                binding.rvCompany.adapter = companyAdapter
+                companyAdapter.notifyDataSetChanged()
+            }
         }
 
         mainViewModel.companyList.observe(this) { list ->
@@ -116,7 +119,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setClickListener() {
-        binding.vgSelectAc.root.setOnClickListener{
+        binding.vgSelectAc.root.setOnClickListener {
             showAccountBottomSheet(R.layout.bottomsheet_select_account, accountList)
         }
         (binding.vgSelectBrand.root as View).setOnClickListener {
@@ -128,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showAccountBottomSheet(layout: Int, locationList: List<Item>) {
+    private fun showAccountBottomSheet(layout: Int, locationList: ArrayList<Item>) {
         val sheetView = layoutInflater.inflate(layout, null)
         val dialog = showBottomSheetDialog(layout, sheetView)
         sheetView.findViewById<ImageView>(R.id.close_bottomsheet)?.setOnClickListener {
@@ -146,50 +149,109 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun showBrandBottomSheet(layout: Int, locationList: List<Item>) {
+    private fun showBrandBottomSheet(layout: Int, locationList: ArrayList<Item>) {
+        val copyOfList = ArrayList<Item>()
+        brandList.forEach { copyOfList.add(Item(it.name, it.status)) }
         val sheetView = layoutInflater.inflate(layout, null)
+        val btApplyFilter = sheetView.findViewById<Button>(R.id.bt_brand_filter)
+        val searchView =
+            sheetView.findViewById<SearchView>(R.id.search_view)
+        val selectAllCB = sheetView.findViewById<CheckBox>(R.id.cb_select_all)
+
         val dialog = showBottomSheetDialog(layout, sheetView)
         sheetView.findViewById<ImageView>(R.id.close_bottomsheet)?.setOnClickListener {
+            brandList = copyOfList
             dialog.dismiss()
         }
-        val btApplyFilter = sheetView.findViewById<Button>(R.id.bt_brand_filter)
+
+
         btApplyFilter.setOnClickListener {
             mainViewModel.setBrandList(brandList)
             dialog.dismiss()
         }
 
-
-
-        val locationAdaptor = BrandListAdapter(locationList)
+        val brandAdaptor = BrandListAdapter(locationList)
         val recyclerView = sheetView.findViewById<RecyclerView>(R.id.rv_brands)
-        recyclerView.adapter = locationAdaptor
+        recyclerView.adapter = brandAdaptor
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val selectAllCB = sheetView.findViewById<CheckBox>(R.id.cb_select_all)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                brandAdaptor.filter.filter(newText)
+                return false
+            }
+
+
+        })
         selectAllCB.setOnCheckedChangeListener { _, flag ->
             brandList.forEach {
                 it.status = flag
-                locationAdaptor.notifyDataSetChanged()
+                brandAdaptor.notifyDataSetChanged()
+            }
+        }
+
+        sheetView.findViewById<TextView>(R.id.clear_selection).setOnClickListener {
+            brandList.forEach {
+                it.status = false
+                selectAllCB.isChecked = false
+                brandAdaptor.notifyDataSetChanged()
             }
         }
     }
 
-    private fun showLocationBottomSheet(layout: Int, locationList: List<Item>) {
+    private fun showLocationBottomSheet(layout: Int, locList: ArrayList<Item>) {
+        val copyOfList = ArrayList<Item>()
+        locationList.forEach { copyOfList.add(Item(it.name, it.status)) }
+
         val sheetView = layoutInflater.inflate(layout, null)
         val dialog = showBottomSheetDialog(layout, sheetView)
+        val btLocationFilter = sheetView.findViewById<Button>(R.id.bt_location_filter)
+        val recyclerView = sheetView.findViewById<RecyclerView>(R.id.rv_location)
+        val searchView = sheetView.findViewById<SearchView>(R.id.search_view)
+        val selectAllCB = sheetView.findViewById<CheckBox>(R.id.cb_select_all)
+
         sheetView.findViewById<ImageView>(R.id.close_bottomsheet)?.setOnClickListener {
+            locationList = copyOfList
             dialog.dismiss()
         }
-        val btLocationFilter = sheetView.findViewById<Button>(R.id.bt_location_filter)
+
         btLocationFilter.setOnClickListener {
             mainViewModel.setLocationList(this.locationList)
             dialog.dismiss()
         }
 
-        val locationAdaptor = BrandListAdapter(locationList)
-        val recyclerView = sheetView.findViewById<RecyclerView>(R.id.rv_location)
+        val locationAdaptor = BrandListAdapter(locList)
         recyclerView.adapter = locationAdaptor
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        selectAllCB.setOnCheckedChangeListener { _, flag ->
+            locationList.forEach {
+                it.status = flag
+                locationAdaptor.notifyDataSetChanged()
+            }
+        }
+
+        sheetView.findViewById<TextView>(R.id.clear_selection).setOnClickListener {
+            locationList.forEach {
+                it.status = false
+                selectAllCB.isChecked = false
+                locationAdaptor.notifyDataSetChanged()
+            }
+        }
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                locationAdaptor.filter.filter(newText)
+                return false
+            }
+        })
     }
 
     private fun showBottomSheetDialog(layout: Int, sheetView: View): BottomSheetDialog {
@@ -211,11 +273,12 @@ class MainActivity : AppCompatActivity() {
     private fun expandBottomSheet(bottomSheetBehavior: BottomSheetBehavior<FrameLayout>) {
         bottomSheetBehavior.skipCollapsed = true
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetBehavior.peekHeight = 80
     }
 
     private fun showFullScreenBottomSheet(bottomSheet: FrameLayout) {
         val layoutParams = bottomSheet.layoutParams
-        layoutParams.height = Resources.getSystem().displayMetrics.heightPixels
+        layoutParams.height = Resources.getSystem().displayMetrics.heightPixels - 200
         bottomSheet.layoutParams = layoutParams
     }
 }

@@ -11,6 +11,10 @@
             <corners
                 android:topRightRadius="24dp"
                 android:topLeftRadius="24dp" />
+            <gradient
+                android:startColor="@color/start_color"
+                android:endColor="@color/end_color"/>
+            <stroke android:color="@color/start_color"/>
         </shape>
     </item>
 </layer-list>
