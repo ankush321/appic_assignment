@@ -17,6 +17,7 @@ class BrandListAdapter(private var list: ArrayList<Item>) : RecyclerView.Adapter
     Filterable {
 
     private var filteredList = ArrayList<Item>()
+    private val copyOriginalList = mutableListOf<Item>().apply { addAll(list) }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BrandViewHolder {
         return BrandViewHolder.create(parent)
     }
@@ -38,16 +39,17 @@ class BrandListAdapter(private var list: ArrayList<Item>) : RecyclerView.Adapter
             override fun performFiltering(text: CharSequence?): FilterResults {
                 val filterResult = FilterResults()
                 if (text == null || text.isEmpty()) {
-                    filteredList.clear()
-                    filterResult.values = filteredList
-                    filterResult.count = filterResult.count
+                    filterResult.values = copyOriginalList
+                    filterResult.count = copyOriginalList.size
+                    return filterResult
                 } else {
+                    filteredList.clear()
                     val filterText = text.toString().lowercase(Locale.getDefault())
-                    list.forEach {
-                        if (it.name.lowercase().contains(filterText)) filteredList.add(it)
+                    copyOriginalList.forEach {
+                        if (it.name.lowercase().startsWith(filterText, true)) filteredList.add(it)
                     }
                 }
-                filterResult.values = filterResult
+                filterResult.values = filteredList
                 filterResult.count = filteredList.size
                 Log.i("FilterData", filteredList.toString())
                 return filterResult
